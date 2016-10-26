@@ -11,3 +11,6 @@ Contains:
 
 * Slides:
      https://goo.gl/ho5sg6
+
+* VM assignments:
+     https://etherpad.openstack.org/p/os-academy-b0
