@@ -1,0 +1,245 @@
+From 638c90cccaca967fec40f474b825444843e1b31e Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Douglas=20Mendiz=C3=A1bal?= <douglas@redrobot.io>
+Date: Tue, 18 Oct 2016 19:55:34 -0500
+Subject: [PATCH 1/2] Make cliff output match the actual field names
+
+Change-Id: I03cb22718fcf92f4ec7dbf72265097e40d233bbd
+---
+ barbicanclient/barbican_cli/secrets.py |  2 +-
+ barbicanclient/containers.py           | 52 ++++++++++++++---------------
+ barbicanclient/orders.py               | 60 +++++++++++++++++-----------------
+ barbicanclient/secrets.py              | 22 ++++++-------
+ 4 files changed, 68 insertions(+), 68 deletions(-)
+
+diff --git a/barbicanclient/barbican_cli/secrets.py b/barbicanclient/barbican_cli/secrets.py
+index cce8009..c3bd3ea 100644
+--- a/barbicanclient/barbican_cli/secrets.py
++++ b/barbicanclient/barbican_cli/secrets.py
+@@ -64,7 +64,7 @@ class GetSecret(show.ShowOne):
+         if args.decrypt or args.payload:
+             entity = self.app.client_manager.key_manager.secrets.get(
+                 args.URI, args.payload_content_type)
+-            return (('Payload',),
++            return (('payload',),
+                     (entity.payload,))
+         else:
+             entity = self.app.client_manager.key_manager.secrets.get(
+diff --git a/barbicanclient/containers.py b/barbicanclient/containers.py
+index 3bf8789..7696ca2 100644
+--- a/barbicanclient/containers.py
++++ b/barbicanclient/containers.py
+@@ -39,13 +39,13 @@ def _immutable_after_save(func):
+ 
+ class ContainerFormatter(formatter.EntityFormatter):
+ 
+-    columns = ("Container href",
+-               "Name",
+-               "Created",
+-               "Status",
+-               "Type",
+-               "Secrets",
+-               "Consumers",
++    columns = ("container_ref",
++               "name",
++               "created",
++               "status",
++               "type",
++               "secrets",
++               "consumers",
+                )
+ 
+     def _get_formatted_data(self):
+@@ -263,15 +263,15 @@ class RSAContainerFormatter(formatter.EntityFormatter):
+     def _get_generic_columns(self):
+         return ContainerFormatter.columns
+ 
+-    columns = ("Container href",
+-               "Name",
+-               "Created",
+-               "Status",
+-               "Type",
+-               "Public Key",
+-               "Private Key",
+-               "PK Passphrase",
+-               "Consumers",
++    columns = ("container_ref",
++               "name",
++               "created",
++               "status",
++               "type",
++               "public_key",
++               "private_key",
++               "private_key_passphrase",
++               "consumers",
+                )
+ 
+     def _get_formatted_data(self):
+@@ -380,16 +380,16 @@ class CertificateContainerFormatter(formatter.EntityFormatter):
+     def _get_generic_columns(self):
+         return ContainerFormatter.columns
+ 
+-    columns = ("Container href",
+-               "Name",
+-               "Created",
+-               "Status",
+-               "Type",
+-               "Certificate",
+-               "Intermediates",
+-               "Private Key",
+-               "PK Passphrase",
+-               "Consumers",
++    columns = ("container_ref",
++               "name",
++               "created",
++               "status",
++               "type",
++               "certificate",
++               "intermediates",
++               "private_key",
++               "private_key_passphrase",
++               "consumers",
+                )
+ 
+     def _get_formatted_data(self):
+diff --git a/barbicanclient/orders.py b/barbicanclient/orders.py
+index 91d4e34..80074eb 100644
+--- a/barbicanclient/orders.py
++++ b/barbicanclient/orders.py
+@@ -37,20 +37,20 @@ def immutable_after_save(func):
+ 
+ class KeyOrderFormatter(formatter.EntityFormatter):
+ 
+-    columns = ("Order href",
+-               "Type",
+-               "Container href",
+-               "Secret href",
+-               "Created",
+-               "Status",
+-               "Error code",
+-               "Error message"
++    columns = ("order_ref",
++               "type",
++               "container_ref",
++               "secret_ref",
++               "created",
++               "status",
++               "error_status_code",
++               "error_reason"
+                )
+ 
+     def _get_formatted_data(self):
+         data = (self.order_ref,
+-                "Key",
+-                "N/A",
++                "key",
++                "",
+                 self.secret_ref,
+                 self.created,
+                 self.status,
+@@ -62,21 +62,21 @@ class KeyOrderFormatter(formatter.EntityFormatter):
+ 
+ class AsymmetricOrderFormatter(formatter.EntityFormatter):
+ 
+-    columns = ("Order href",
+-               "Type",
+-               "Container href",
+-               "Secret href",
+-               "Created",
+-               "Status",
+-               "Error code",
+-               "Error message"
++    columns = ("order_ref",
++               "type",
++               "container_ref",
++               "secret_ref",
++               "created",
++               "status",
++               "error_status_code",
++               "error_reason"
+                )
+ 
+     def _get_formatted_data(self):
+         data = (self.order_ref,
+-                "Asymmetric",
++                "asymmetric",
+                 self.container_ref,
+-                "N/A",
++                "",
+                 self.created,
+                 self.status,
+                 self.error_status_code,
+@@ -87,21 +87,21 @@ class AsymmetricOrderFormatter(formatter.EntityFormatter):
+ 
+ class CertificateOrderFormatter(formatter.EntityFormatter):
+ 
+-    columns = ("Order href",
+-               "Type",
+-               "Container href",
+-               "Secret href",
+-               "Created",
+-               "Status",
+-               "Error code",
+-               "Error message"
++    columns = ("order_ref",
++               "type",
++               "container_ref",
++               "secret_ref",
++               "created",
++               "status",
++               "error_status_code",
++               "error_reason"
+                )
+ 
+     def _get_formatted_data(self):
+         data = (self.order_ref,
+-                "Certificate",
++                "certificate",
+                 self.container_ref,
+-                "N/A",
++                "",
+                 self.created,
+                 self.status,
+                 self.error_status_code,
+diff --git a/barbicanclient/secrets.py b/barbicanclient/secrets.py
+index 220d7f3..80fdd12 100644
+--- a/barbicanclient/secrets.py
++++ b/barbicanclient/secrets.py
+@@ -48,16 +48,16 @@ def immutable_after_save(func):
+ 
+ class SecretFormatter(formatter.EntityFormatter):
+ 
+-    columns = ("Secret href",
+-               "Name",
+-               "Created",
+-               "Status",
+-               "Content types",
+-               "Algorithm",
+-               "Bit length",
+-               "Secret type",
+-               "Mode",
+-               "Expiration",
++    columns = ("secret_ref",
++               "name",
++               "created",
++               "status",
++               "content_types",
++               "algorithm",
++               "bit_length",
++               "secret_type",
++               "mode",
++               "expiration",
+                )
+ 
+     def _get_formatted_data(self):
+@@ -460,7 +460,7 @@ class SecretManager(base.BaseEntityManager):
+         :raises barbicanclient.exceptions.HTTPClientError: 4xx Responses
+         :raises barbicanclient.exceptions.HTTPServerError: 5xx Responses
+         """
+-        LOG.debug("Getting secret - Secret href: {0}".format(secret_ref))
++        LOG.debug("Getting secret - secret_ref: {0}".format(secret_ref))
+         base.validate_ref(secret_ref, 'Secret')
+         return Secret(
+             api=self._api,
+-- 
+2.8.4 (Apple Git-73)
+
